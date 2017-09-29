@@ -11,13 +11,15 @@ import java.util.Stack;
 
 import Tool.Hasher;
 
-
+//class of return object of vo
 class VOreturn{
 	public String hash="";
 	public Rect MBR=null;
 }
 
 public class STRTree {
+	//nodelist stores the STRNode objects from the input file
+	//file input: double double double double
 	private ArrayList<STRNode> nodelist;
 	private ArrayList<STRNode> rootnodes;
 	public STRNode root;
@@ -32,6 +34,7 @@ public class STRTree {
 	        while ((line=br.readLine())!=null) {
 	        	//System.out.println(line);
 	            arrs=line.split(" ");
+	            //create a new Rect object from the 4 double numbers
 	            Rect r = new Rect(new Point(Double.valueOf(arrs[1]),Double.valueOf(arrs[2])));
 	            nodelist.add(new STRNode(r,true,null,""));
 	            //System.out.println("successfully");
@@ -43,10 +46,17 @@ public class STRTree {
 		catch(Exception e) {
 			
 		}
+		
+		//use the nodelist to create a strtree
+		//input: nodec,nodelist
+		//output: root nodes which size is less than nodec
 		rootnodes = createTree(nodec);
+		//combine the root nodes list to one node:root
 		root = mergeRoot(rootnodes);
 	}
 	
+	//input: rootnodes which size smaller than nodec
+	//output: single root strnode object
 	private STRNode mergeRoot(ArrayList<STRNode> rootnodes) {
 		STRNode root = null;
 		Rect mbr = getMBR(rootnodes);
@@ -60,6 +70,9 @@ public class STRTree {
 		root = new STRNode(mbr,false,rootnodes,hash);
 		return root;
 	}
+	
+	
+	//use nodelist to construct a strtree
 	private ArrayList<STRNode> createTree(int nodec){
 		//x axid comparator for sorting
 				Comparator xcomp = new Comparator<STRNode>() {
@@ -85,6 +98,7 @@ public class STRTree {
 				};
 				//temporary variable of current layer nodes
 				ArrayList<STRNode> current = nodelist;
+				//build the STRTree in a bottom-up manner
 				do {
 					ArrayList<STRNode> cur = new ArrayList<STRNode>();
 					int xsliceCount = (int) Math.ceil(current.size()/(double)nodec);
@@ -94,6 +108,7 @@ public class STRTree {
 				    	int ysliceCount = (int) Math.ceil(temp.size()/(double)nodec);
 				    	ArrayList[] yslices = stripPartition(temp,ysliceCount,ycomp);
 				    	
+				    	//construct higher level nodes
 				    	for(ArrayList<STRNode> arr : yslices) {
 				    		if(arr.get(0).isleaf==true) {
 				    			String hash = "";
@@ -116,20 +131,21 @@ public class STRTree {
 				    		
 				    	}
 					}
+					//update the input of nodes on current layer
 					current = cur;
 				}
 				while(current.size()>nodec);
 				return current;
 	}
 	
-	
+	//BFStraverse function
 	public void BFStraverse() {
 		Queue<STRNode> st = new LinkedList<STRNode>();
 		st.offer(root);
 		while(!st.isEmpty()) {
 			STRNode n = st.poll();
 			if(n.isleaf) {
-				System.out.println("data point: "+n.MBR+" data hash: "+n.hashvalue);
+				System.out.println("data point: "+n.MBR+" data hash: ");
 			}
 			else {
 				System.out.println("internal node:"+n.MBR+" internal hash: "+n.hashvalue);
@@ -156,6 +172,9 @@ public class STRTree {
 			}
 		}
 	}
+	
+	//input: STRNode, query range, empty VO list
+	//process in recurrent format
 	public void secureRangeQuery(STRNode n,Rect query,LinkedList<String> VO)
 	{
 		VO.add("[");
@@ -178,7 +197,8 @@ public class STRTree {
 		VO.add("]");
 	}
 	
-	
+	//input: VO list
+	//output: the root VOreturn object including the corresponding MBR and hash value
 	public VOreturn RootHash(LinkedList<String> VO) {
 		String str = "";
 		Rect MBR = null;
@@ -212,6 +232,7 @@ public class STRTree {
 		ret.MBR=MBR;
 		return ret;
 	}
+	
 	
 	private Rect enLargeMBR(Rect MBR_c,Rect MBR){
 		if(MBR==null) {
@@ -252,7 +273,7 @@ public class STRTree {
 	}
 	
 	//transform the double array MBR to String version
-	public static String MBRtoString(Rect MBR) {
+	private String MBRtoString(Rect MBR) {
 		String str= "";
 		str = str + String.valueOf(MBR.x1)+" ";
 		str = str + String.valueOf(MBR.x2)+" ";

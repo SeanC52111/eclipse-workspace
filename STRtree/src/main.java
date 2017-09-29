@@ -101,5 +101,6 @@ public class main {
         VOreturn voreturn = strtree.RootHash(VO);
         System.out.println(voreturn.hash);
         System.out.println(strtree.root.MBR.toString()+strtree.root.hashvalue);
+        System.out.println(voreturn.hash.equals(strtree.root.MBR.toString()+strtree.root.hashvalue));
 	}
 }
