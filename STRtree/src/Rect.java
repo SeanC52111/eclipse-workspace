@@ -37,6 +37,14 @@ public class Rect {
 	public Point getCenter() {
 		return new Point((x1+x2)/2.0,(y1+y2)/2.0);
 	}
+	
+	public boolean isIntersects(Rect r) {
+		if(r.x2 < x1 || r.x1 > x2)
+			return false;
+		if(r.y1 > y2 || r.y2 < y1)
+			return false;
+		return true;
+	}
 	@Override
 	public String toString() {
 		String str = ""+x1+" "+x2+" "+y1+" "+y2;
