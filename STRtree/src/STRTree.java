@@ -23,30 +23,12 @@ public class STRTree {
 	private ArrayList<STRNode> nodelist;
 	private ArrayList<STRNode> rootnodes;
 	public STRNode root;
-	public STRTree(String filename,int nodec) {
-		try {
-			nodelist = new ArrayList<STRNode>();
-			FileInputStream fis=new FileInputStream(filename);
-	        InputStreamReader isr=new InputStreamReader(fis);
-	        BufferedReader br = new BufferedReader(isr);
-	        String line="";
-	        String[] arrs=null;
-	        while ((line=br.readLine())!=null) {
-	        	//System.out.println(line);
-	            arrs=line.split(" ");
-	            //create a new Rect object from the 4 double numbers
-	            Rect r = new Rect(new Point(Double.valueOf(arrs[1]),Double.valueOf(arrs[2])));
-	            nodelist.add(new STRNode(r,true,null,""));
-	            //System.out.println("successfully");
-	        }
-	        br.close();
-	        isr.close();
-	        fis.close();
+	public STRTree(ArrayList<Rect> rectlist,int nodec) {
+		nodelist = new ArrayList<STRNode>();
+		rootnodes = new ArrayList<STRNode>();
+		for(Rect r: rectlist) {
+			nodelist.add(new STRNode(r,true,null,""));
 		}
-		catch(Exception e) {
-			
-		}
-		
 		//use the nodelist to create a strtree
 		//input: nodec,nodelist
 		//output: root nodes which size is less than nodec
@@ -175,18 +157,19 @@ public class STRTree {
 	
 	//input: STRNode, query range, empty VO list
 	//process in recurrent format
-	public void secureRangeQuery(STRNode n,Rect query,LinkedList<String> VO)
+	public void secureRangeQuery(STRNode n,Rect query,ArrayList<Rect> result,LinkedList<String> VO)
 	{
 		VO.add("[");
 		for(int i =0;i<n.child.size();i++) {
 			if(query.isIntersects(n.child.get(i).MBR) && !n.child.get(i).isleaf) {
-				secureRangeQuery(n.child.get(i),query,VO);
+				secureRangeQuery(n.child.get(i),query,result,VO);
 			}
 			else {
 				if(n.child.get(i).isleaf) {
 					VO.add(n.child.get(i).MBR.toString());
 					if(n.child.get(i).MBR.isIntersects(query)) {
-						System.out.println("result: "+n.child.get(i).MBR.toString());
+						//System.out.println("result: "+n.child.get(i).MBR.toString());
+						result.add(n.child.get(i).MBR);
 					}
 				}
 				else

@@ -78,7 +78,6 @@ class DrawFrame extends JFrame{
 
 public class main {
 	public static void main(String [] args) {
-		ArrayList<STRNode> nodelist = new ArrayList<STRNode>();
 		/*
 		Random random = new Random();
 		for(int i = 0;i<15;i++) {
@@ -88,12 +87,40 @@ public class main {
 			System.out.println(n.MBR);
 		}
 		*/
-		STRTree strtree = new STRTree("datapoints.txt",3);
+		ArrayList<Rect> rlist = new ArrayList<Rect>();
+		try {
+			FileInputStream fis=new FileInputStream("datapoints.txt");
+	        InputStreamReader isr=new InputStreamReader(fis);
+	        BufferedReader br = new BufferedReader(isr);
+	        String line="";
+	        String[] arrs=null;
+	        while ((line=br.readLine())!=null) {
+	        	//System.out.println(line);
+	            arrs=line.split(" ");
+	            //create a new Rect object from the 4 double numbers
+	            Rect r = new Rect(new Point(Double.valueOf(arrs[1]),Double.valueOf(arrs[2])));
+	            rlist.add(r);
+	            //System.out.println("successfully");
+	        }
+	        br.close();
+	        isr.close();
+	        fis.close();
+		}
+		catch(Exception e) {
+			
+		}
+		STRTree strtree = new STRTree(rlist,3);
 		//strtree.DFStraverse();
 		DrawFrame df=new DrawFrame(strtree.root.child);
         df.setVisible(true);
         LinkedList<String> VO = new LinkedList<String>();
-        strtree.secureRangeQuery(strtree.root, new Rect(3,15,10,70), VO);
+        ArrayList<Rect> result = new ArrayList<Rect>();
+        strtree.DFStraverse();
+        strtree.secureRangeQuery(strtree.root, new Rect(3,15,10,70),result, VO);
+        System.out.println("range query results:");
+        for(Rect r: result) {
+        	System.out.println(r.toString());
+        }
         System.out.println("VOs:");
         for(String s:VO) {
         	System.out.println(s);
